@@ -14,7 +14,7 @@
 
 LOG_MODULE_REGISTER(ICM42688_DECODER, CONFIG_SENSOR_LOG_LEVEL);
 
-#define DT_DRV_COMPAT invensense_icm42688
+#define DT_DRV_COMPAT oresat_icm42688
 
 static int icm42688_get_shift(enum sensor_channel channel, int accel_fs, int gyro_fs, int8_t *shift)
 {

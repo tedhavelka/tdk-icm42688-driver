@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define DT_DRV_COMPAT invensense_icm42688
+#define DT_DRV_COMPAT oresat_icm42688
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/emul.h>

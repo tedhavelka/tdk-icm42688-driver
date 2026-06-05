@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define DT_DRV_COMPAT invensense_icm42688
+#define DT_DRV_COMPAT oresat_icm42688
 
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/sensor/icm42688.h>
