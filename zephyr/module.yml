@@ -1,0 +1,6 @@
+name: oresat-icm42688
+build:
+  cmake: .
+  Kconfig: Kconfig
+  settings:
+    dts_root: .
