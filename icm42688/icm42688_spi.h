@@ -1,11 +1,12 @@
 /*
  * Copyright (c) 2022 Intel Corporation
+ * Copyright (c) 2026 Portland State University Oresat Team
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ZEPHYR_DRIVERS_SENSOR_ICM42688_SPI_H_
-#define ZEPHYR_DRIVERS_SENSOR_ICM42688_SPI_H_
+#ifndef ORESAT_DRIVERS_SENSOR_ICM42688_SPI_H_
+#define ORESAT_DRIVERS_SENSOR_ICM42688_SPI_H_
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/spi.h>
@@ -52,4 +53,4 @@ int icm42688_spi_update_register(const struct spi_dt_spec *bus, uint16_t reg, ui
  */
 int icm42688_spi_read(const struct spi_dt_spec *bus, uint16_t reg, uint8_t *data, size_t len);
 
-#endif /* ZEPHYR_DRIVERS_SENSOR_ICM42688_SPI_H_ */
+#endif /* ORESAT_DRIVERS_SENSOR_ICM42688_SPI_H_ */

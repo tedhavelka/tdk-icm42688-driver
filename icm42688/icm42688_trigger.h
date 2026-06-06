@@ -1,12 +1,13 @@
 /*
  * Copyright (c) 2022 Intel Corporation
  * Copyright (c) 2023 Google LLC
+ * Copyright (c) 2026 Portland State University Oresat Team
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ZEPHYR_DRIVERS_SENSOR_ICM42688_TRIGGER_H_
-#define ZEPHYR_DRIVERS_SENSOR_ICM42688_TRIGGER_H_
+#ifndef ORESAT_DRIVERS_SENSOR_ICM42688_TRIGGER_H_
+#define ORESAT_DRIVERS_SENSOR_ICM42688_TRIGGER_H_
 
 #include <zephyr/device.h>
 
@@ -45,4 +46,4 @@ void icm42688_lock(const struct device *dev);
  */
 void icm42688_unlock(const struct device *dev);
 
-#endif /* ZEPHYR_DRIVERS_SENSOR_ICM42688_TRIGGER_H_ */
+#endif /* ORESAT_DRIVERS_SENSOR_ICM42688_TRIGGER_H_ */

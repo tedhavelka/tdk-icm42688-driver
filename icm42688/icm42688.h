@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ZEPHYR_DRIVERS_SENSOR_ICM42688_H_
-#define ZEPHYR_DRIVERS_SENSOR_ICM42688_H_
+#ifndef ORESAT_DRIVER_SENSOR_ICM42688_H_
+#define ORESAT_DRIVER_SENSOR_ICM42688_H_
 
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/sensor.h>
@@ -328,15 +328,15 @@ struct icm42688_trigger_entry {
  */
 struct icm42688_dev_data {
 	struct icm42688_cfg cfg;
-#ifdef CONFIG_ICM42688_TRIGGER
-#if defined(CONFIG_ICM42688_TRIGGER_OWN_THREAD)
-	K_KERNEL_STACK_MEMBER(thread_stack, CONFIG_ICM42688_THREAD_STACK_SIZE);
+#ifdef CONFIG_ORESAT_ICM42688_TRIGGER
+#if defined(CONFIG_ORESAT_ICM42688_TRIGGER_OWN_THREAD)
+	K_KERNEL_STACK_MEMBER(thread_stack, CONFIG_ORESAT_ICM42688_THREAD_STACK_SIZE);
 	struct k_thread thread;
 	struct k_sem gpio_sem;
-#elif defined(CONFIG_ICM42688_TRIGGER_GLOBAL_THREAD)
+#elif defined(CONFIG_ORESAT_ICM42688_TRIGGER_GLOBAL_THREAD)
 	struct k_work work;
 #endif
-#ifdef CONFIG_ICM42688_STREAM
+#ifdef CONFIG_ORESAT_ICM42688_STREAM
 	struct rtio_iodev_sqe *streaming_sqe;
 	struct rtio *r;
 	struct rtio_iodev *spi_iodev;
@@ -344,13 +344,13 @@ struct icm42688_dev_data {
 	uint16_t fifo_count;
 	uint64_t timestamp;
 	atomic_t reading_fifo;
-#endif /* CONFIG_ICM42688_STREAM */
+#endif /* CONFIG_ORESAT_ICM42688_STREAM */
 	const struct device *dev;
 	struct gpio_callback gpio_cb;
 	sensor_trigger_handler_t data_ready_handler;
 	const struct sensor_trigger *data_ready_trigger;
 	struct k_mutex mutex;
-#endif /* CONFIG_ICM42688_TRIGGER */
+#endif /* CONFIG_ORESAT_ICM42688_TRIGGER */
 
 	int16_t readings[7];
 };
@@ -617,4 +617,4 @@ static inline void icm42688_temp_c(int32_t in, int32_t *out_c, int32_t *out_uc)
 	*out_uc = ((in100 - (*out_c) * sensitivity) * INT64_C(1000000)) / sensitivity;
 }
 
-#endif /* ZEPHYR_DRIVERS_SENSOR_ICM42688_H_ */
+#endif /* ORESAT_DRIVER_SENSOR_ICM42688_H_ */

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ZEPHYR_DRIVERS_SENSOR_ICM42688_DECODER_H_
-#define ZEPHYR_DRIVERS_SENSOR_ICM42688_DECODER_H_
+#ifndef ORESAT_DRIVERS_SENSOR_ICM42688_DECODER_H_
+#define ORESAT_DRIVERS_SENSOR_ICM42688_DECODER_H_
 
 #include <stdint.h>
 #include <zephyr/drivers/sensor.h>
@@ -44,4 +44,4 @@ int icm42688_encode(const struct device *dev, const struct sensor_chan_spec *con
 
 int icm42688_get_decoder(const struct device *dev, const struct sensor_decoder_api **decoder);
 
-#endif /* ZEPHYR_DRIVERS_SENSOR_ICM42688_DECODER_H_ */
+#endif /* ORESAT_DRIVERS_SENSOR_ICM42688_DECODER_H_ */

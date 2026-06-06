@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2023 Google LLC
+ * Copyright (c) 2026 Portland State University Oresat Team
  * SPDX-License-Identifier: Apache-2.0
  */
 

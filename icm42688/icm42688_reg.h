@@ -1,11 +1,12 @@
 /*
  * Copyright (c) 2022 Intel Corporation
  * Copyright 2025 CogniPilot Foundation
+ * Copyright (c) 2026 Portland State University Oresat Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ZEPHYR_DRIVERS_SENSOR_ICM42688_REG_H_
-#define ZEPHYR_DRIVERS_SENSOR_ICM42688_REG_H_
+#ifndef ORESAT_DRIVERS_SENSOR_ICM42688_REG_H_
+#define ORESAT_DRIVERS_SENSOR_ICM42688_REG_H_
 
 #include <zephyr/sys/util.h>
 
@@ -519,4 +520,4 @@
 #define FIFO_HEADER_ODR_ACCEL	    BIT(1)
 #define FIFO_HEADER_ODR_GYRO	    BIT(0)
 
-#endif /* ZEPHYR_DRIVERS_SENSOR_ICM42688_REG_H_ */
+#endif /* ORESAT_DRIVERS_SENSOR_ICM42688_REG_H_ */
