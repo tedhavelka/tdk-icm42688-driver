@@ -1,0 +1,15 @@
+# Copyright (c) Portland State University Oresat Team
+# SPDX-License-Identifier: 
+#
+description: |
+
+    Example:
+    #include <zephyr/dt-bindings/sensor/icm42688.h>
+
+    &spi0 {
+      ...
+    };
+
+compatible: "oresat,icm42688"
+
+include: ["spi-device.yaml", "oresat,icm42688-common.yaml"]

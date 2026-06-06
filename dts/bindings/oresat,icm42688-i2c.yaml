@@ -1,0 +1,13 @@
+# Copyright (c) 2026 Portland State University Oresat Team
+# # SPDX-License-Identifier: MIT
+
+description: |
+    Example:
+    #include <zephyr/dt-bindings/sensor/icm42688.h>
+    
+    . . . Note that the above include is for a Zephyr in-tree header and not
+    a custom Oresat header of the modified ICM42688 driver.
+
+compatible: "oresat,icm42688"
+
+include: ["i2c-device.yaml", "oresat,icm42688-common.yaml"]
