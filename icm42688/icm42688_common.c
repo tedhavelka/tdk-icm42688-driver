@@ -258,7 +258,7 @@ int icm42688_configure(const struct device *dev, struct icm42688_cfg *cfg)
 	}
 
 	/* Pulse mode with async reset (resets interrupt line on int status read) */
-	if (IS_ENABLED(CONFIG_ICM42688_TRIGGER)) {
+	if (IS_ENABLED(CONFIG_ORESAT_ICM42688_TRIGGER)) {
 		res = icm42688_trigger_enable_interrupt(dev, cfg);
 	} else {
 		res = icm42688_spi_single_write(&dev_cfg->spi, REG_INT_CONFIG,

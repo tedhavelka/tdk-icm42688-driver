@@ -278,7 +278,7 @@ static DEVICE_API(sensor, icm42688_driver_api) = {
 	.channel_get = icm42688_channel_get,
 	.attr_set = icm42688_attr_set,
 	.attr_get = icm42688_attr_get,
-#ifdef CONFIG_ICM42688_TRIGGER
+#ifdef CONFIG_ORESAT_ICM42688_TRIGGER
 	.trigger_set = icm42688_trigger_set,
 #endif
 	.get_decoder = icm42688_get_decoder,
@@ -303,7 +303,7 @@ int icm42688_init(const struct device *dev)
 		return -EIO;
 	}
 
-#ifdef CONFIG_ICM42688_TRIGGER
+#ifdef CONFIG_ORESAT_ICM42688_TRIGGER
 	res = icm42688_trigger_init(dev);
 	if (res != 0) {
 		LOG_ERR("Failed to initialize triggers");
@@ -320,7 +320,7 @@ int icm42688_init(const struct device *dev)
 	return 0;
 }
 
-#ifndef CONFIG_ICM42688_TRIGGER
+#ifndef CONFIG_ORESAT_ICM42688_TRIGGER
 void icm42688_lock(const struct device *dev)
 {
 	ARG_UNUSED(dev);

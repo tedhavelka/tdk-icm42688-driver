@@ -26,9 +26,9 @@ static void icm42688_gpio_callback(const struct device *dev, struct gpio_callbac
 	ARG_UNUSED(dev);
 	ARG_UNUSED(pins);
 
-#if defined(CONFIG_ICM42688_TRIGGER_OWN_THREAD)
+#if defined(CONFIG_ORESAT_ICM42688_TRIGGER_OWN_THREAD)
 	k_sem_give(&data->gpio_sem);
-#elif defined(CONFIG_ICM42688_TRIGGER_GLOBAL_THREAD)
+#elif defined(CONFIG_ORESAT_ICM42688_TRIGGER_GLOBAL_THREAD)
 	k_work_submit(&data->work);
 #endif
 	if (IS_ENABLED(CONFIG_ICM42688_STREAM)) {
@@ -36,7 +36,7 @@ static void icm42688_gpio_callback(const struct device *dev, struct gpio_callbac
 	}
 }
 
-#if defined(CONFIG_ICM42688_TRIGGER_OWN_THREAD) || defined(CONFIG_ICM42688_TRIGGER_GLOBAL_THREAD)
+#if defined(CONFIG_ORESAT_ICM42688_TRIGGER_OWN_THREAD) || defined(CONFIG_ORESAT_ICM42688_TRIGGER_GLOBAL_THREAD)
 static void icm42688_thread_cb(const struct device *dev)
 {
 	struct icm42688_dev_data *data = dev->data;
@@ -51,7 +51,7 @@ static void icm42688_thread_cb(const struct device *dev)
 }
 #endif
 
-#ifdef CONFIG_ICM42688_TRIGGER_OWN_THREAD
+#ifdef CONFIG_ORESAT_ICM42688_TRIGGER_OWN_THREAD
 
 static void icm42688_thread(void *p1, void *p2, void *p3)
 {
@@ -66,7 +66,7 @@ static void icm42688_thread(void *p1, void *p2, void *p3)
 	}
 }
 
-#elif defined(CONFIG_ICM42688_TRIGGER_GLOBAL_THREAD)
+#elif defined(CONFIG_ORESAT_ICM42688_TRIGGER_GLOBAL_THREAD)
 
 static void icm42688_work_handler(struct k_work *work)
 {
@@ -139,12 +139,12 @@ int icm42688_trigger_init(const struct device *dev)
 	}
 
 	k_mutex_init(&data->mutex);
-#if defined(CONFIG_ICM42688_TRIGGER_OWN_THREAD)
+#if defined(CONFIG_ORESAT_ICM42688_TRIGGER_OWN_THREAD)
 	k_sem_init(&data->gpio_sem, 0, K_SEM_MAX_LIMIT);
 	k_thread_create(&data->thread, data->thread_stack, CONFIG_ICM42688_THREAD_STACK_SIZE,
 			icm42688_thread, data, NULL, NULL,
 			K_PRIO_COOP(CONFIG_ICM42688_THREAD_PRIORITY), 0, K_NO_WAIT);
-#elif defined(CONFIG_ICM42688_TRIGGER_GLOBAL_THREAD)
+#elif defined(CONFIG_ORESAT_ICM42688_TRIGGER_GLOBAL_THREAD)
 	data->work.handler = icm42688_work_handler;
 #endif
 	return gpio_pin_interrupt_configure_dt(&cfg->gpio_int1, GPIO_INT_EDGE_TO_ACTIVE);
