@@ -1,7 +1,36 @@
-Overview
+# ICM42688P Zephyr Driver Work
 
-In Zephyr 4.2.0 a driver exists for TDK/Invensense ICM45686 which supports SPI,
-I2C and I3C bus protocols.  The source files for this driver are:
+Out-of-tree driver work on Zephyr 4.2.0 ICM42688 driver code base, to add I2C
+support.
+
+## Overview
+
+In Zephyr 4.2.0 a driver exists for TDK/Invensense ICM42688 inertial measurement
+unit, but its bus support extends only to SPI bus interface and not I2C.  In the
+same Zephyr release there is also a driver for the ICM45686 which supports SPI,
+I2C and I3C bus protocols.  This driver looks like a good place to find working
+example code to extend the driver for the similar 42688.
+
+There is a second challenge to this driver development in that both drivers use
+the relatively newer Zephyr RTIO subsystem.  This system is more effecient at
+sensor communications than the long standing sensor fetch and get model.  It is
+also more complex.  How the ICM45686 driver conveys I2C device structure and
+data to the RTIO subsystme is a significant piece of the coding implementation.
+
+Yet a third area in complete driver work is the way in which user applications
+are able and or must call the newer, RTIO based drivers in recent 4.x releases
+of Zephyr RTOS.
+
+In summary the three coding areas with which project initiator and contributor
+Ted H begins this work are:
+
+- I2C device struct, data buffers and driver internal APIs
+- connection of I2C code to RTIO APIs
+- application calls to driver to elicit readings and change sensor settings
+
+## ICM45686 As Example
+
+The source files for the ICM45686 driver are:
 
 ```
 -rw-rw-r-- 1 ted ted   431 jun  4 05:26 CMakeLists.txt
@@ -61,7 +90,7 @@ File icm45686.h defines eight structures.  These are just the structure names . 
 164:struct icm45686_config {
 ```
 
-In [icm45686.c](https://github.com/zephyrproject-rtos/zephyr/blob/413b789deb391d3a37d06b463288a5fe765ee57e/drivers/sensor/tdk/icm45686/icm45686.c "ICM45686 driver source icm45686.c") the functions ``static inline int reg_read()`` and ``static inline int reg_write()`` are wrappers to ``icm45686_bus_read()`` and ``icm45686_bus_read()``.  Overall icm45686.c contains the functions:
+In [icm45686.c](https://github.com/zephyrproject-rtos/zephyr/blob/413b789deb391d3a37d06b463288a5fe765ee57e/drivers/sensor/tdk/icm45686/icm45686.c "ICM45686 driver source icm45686.c") the functions ``static inline int reg_read()`` and ``static inline int reg_write()`` are wrappers to ``icm45686_bus_read()`` and ``icm45686_bus_write()``.  Overall icm45686.c contains the functions:
 
 - static inline int reg_write(const struct device *dev, uint8_t reg, uint8_t val)
 - static inline int reg_read(const struct device *dev, uint8_t reg, uint8_t *val)
@@ -71,3 +100,55 @@ In [icm45686.c](https://github.com/zephyrproject-rtos/zephyr/blob/413b789deb391d
 - static inline void icm45686_submit_one_shot(const struct device *dev, struct rtio_iodev_sqe *iodev_sqe)
 - static void icm45686_submit(const struct device *dev, struct rtio_iodev_sqe *iodev_sqe)
 - static int icm45686_init(const struct device *dev)
+
+So a question to answer here is how many places call reg_read() and reg_write()?  There is a possibility that routines which call these functions will reveal how the driver configures and queries the sensor for data.  There are a modest number of calls to these two driver functions:
+
+```
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm45686$ grep -n reg_read ./*
+./icm45686.c:37:static inline int reg_read(const struct device *dev, uint8_t reg, uint8_t *val)
+./icm45686.c:281:		err = reg_read(dev, REG_MISC2, &read_val);
+./icm45686.c:308:	err = reg_read(dev, REG_WHO_AM_I, &read_val);
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm45686$ grep -n reg_write ./*
+./icm45686.c:32:static inline int reg_write(const struct device *dev, uint8_t reg, uint8_t val)
+./icm45686.c:272:		err = reg_write(dev, REG_MISC2, REG_MISC2_SOFT_RST(1));
+./icm45686.c:294:	err = reg_write(dev, REG_DRIVE_CONFIG0, REG_DRIVE_CONFIG0_SPI_SLEW(2));
+./icm45686.c:299:	err = reg_write(dev, REG_DRIVE_CONFIG1, REG_DRIVE_CONFIG1_I3C_SLEW(3));
+./icm45686.c:323:	err = reg_write(dev, REG_PWR_MGMT0, val);
+./icm45686.c:331:	err = reg_write(dev, REG_ACCEL_CONFIG0, val);
+./icm45686.c:339:	err = reg_write(dev, REG_GYRO_CONFIG0, val);
+```
+
+Here are all the driver's calls to its internal icm45686_bus_read() and icm45686_bus_write() functions:
+
+```
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm45686$ grep -n icm45686_bus_read ./*
+./icm45686_bus.h:17:static inline int icm45686_bus_read(const struct device *dev,
+./icm45686.c:39:	return icm45686_bus_read(dev, reg, val, 1);
+./icm45686.c:53:	err = icm45686_bus_read(dev,
+./icm45686_stream.c:543:		err = icm45686_bus_read(dev, REG_INT1_STATUS0, &val, 1);
+./icm45686_trigger.c:85:	err = icm45686_bus_read(dev, REG_INT1_CONFIG0, &val, 1);
+
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm45686$ grep -n icm45686_bus_write ./*
+./icm45686_bus.h:61:static inline int icm45686_bus_write(const struct device *dev,
+./icm45686.c:34:	return icm45686_bus_write(dev, reg, &val, 1);
+./icm45686.c:352:	err = icm45686_bus_write(dev, REG_IREG_ADDR_15_8, gyro_lpf_write_array,
+./icm45686.c:370:	err = icm45686_bus_write(dev, REG_IREG_ADDR_15_8, accel_lpf_write_array,
+./icm45686_stream.c:534:		err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_stream.c:555:		err = icm45686_bus_write(dev, REG_FIFO_CONFIG3, &val, 1);
+./icm45686_stream.c:566:		err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_stream.c:576:		err = icm45686_bus_write(dev, REG_FIFO_CONFIG0, &val, 1);
+./icm45686_stream.c:591:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG2, &val, 1);
+./icm45686_stream.c:599:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG1_0, (uint8_t *)&fifo_ths, 2);
+./icm45686_stream.c:609:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG0, &val, 1);
+./icm45686_stream.c:621:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG3, &val, 1);
+./icm45686_stream.c:672:		err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_stream.c:680:		err = icm45686_bus_write(dev, REG_INT1_CONFIG2, &val, 1);
+./icm45686_trigger.c:91:	err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_trigger.c:100:	return icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_trigger.c:200:	err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_trigger.c:208:	err = icm45686_bus_write(dev, REG_INT1_CONFIG2, &val, 1);
+```
+
+## How ICM42688 Driver Transacts On Bus
+
+
