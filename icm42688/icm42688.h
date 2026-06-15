@@ -14,6 +14,11 @@
 #include <zephyr/dt-bindings/sensor/icm42688.h>
 #include <stdlib.h>
 
+enum icm42688_bus_type {
+	ICM42688_BUS_SPI,
+	ICM42688_BUS_I2C,
+};
+
 struct alignment {
 	int8_t index;
 	int8_t sign;
@@ -338,8 +343,8 @@ struct icm42688_dev_data {
 #endif
 #ifdef CONFIG_ORESAT_ICM42688_STREAM
 	struct rtio_iodev_sqe *streaming_sqe;
-	struct rtio *r;
-	struct rtio_iodev *spi_iodev;
+	struct rtio *ctx;
+	struct rtio_iodev *iodev;
 	uint8_t int_status;
 	uint16_t fifo_count;
 	uint64_t timestamp;
@@ -359,7 +364,9 @@ struct icm42688_dev_data {
  * @brief Device config (struct device)
  */
 struct icm42688_dev_cfg {
-	struct spi_dt_spec spi;
+	// Reference to SPI device tree spec struct refactored, now conditional
+	// based on $(dt_compat_on_bus,...) Zephyr DTS function or macro.
+	// struct spi_dt_spec spi;
 	struct gpio_dt_spec gpio_int1;
 	struct gpio_dt_spec gpio_int2;
 };
