@@ -90,6 +90,96 @@ File icm45686.h defines eight structures.  These are just the structure names . 
 164:struct icm45686_config {
 ```
 
+Just prior to struct icm45686_data an enum is defined to provide symbols which are used to select one of the three data bus types this sensor supports:
+
+```
+enum icm45686_bus_type {
+        ICM45686_BUS_SPI,
+        ICM45686_BUS_I2C,
+        ICM45686_BUS_I3C,
+};
+```
+
+## Comparison Of Driver Structure ICM45686 Versus ICM42688
+
+The ICM45686 driver defines eight structures, while the ICM42688 defines five.
+Table 1 
+
+_Table 1 - driver structs for the 45686 and 42688 IMU devices_
+
+```
+|:---------------------------------:|:---------------------------------:|:----------------------------------:|:--------------------------------:|
+|        ICM45686 structures        |        ICM42688 Structures        |      45686 struct content          |   42688 struct content           |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_encoded_payload { }      | sensor data                       |                                    |                                  |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_encoded_fifo_payload { } | sensor data                       |                                    |                                  |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_encoded_header {         | sensor data                       |                                    |                                  |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_encoded_data { }         | summary of first three            |                                    |                                  |
+|                                   | sensor data struct values         |                                    |                                  |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_triggers { }             | struct icm42688_trigger_entry { } | struct {                           | struct sensor_trigger trigger;   |
+|                                   |                                   |   struct gpio_callback;            | sensor_trigger_handler_t cb;     |
+|                                   |                                   |   const struct device *;           |                                  |
+|                                   |                                   |   struct k_mutex;                  |                                  |
+|                                   |                                   |   struct {                         |                                  |
+|                                   |                                   |     struct sensor_trigger trigger; |                                  |
+|                                   |                                   |     sensor_trigger_handler_t cb;   |                                  |
+|                                   |                                   |   } entry;                         |                                  |
+|                                   |                                   |  [cond]                            |                                  |
+|                                   |                                   |   OWN_THREAD                       |                                  |
+|                                   |                                   |  [cond]                            |                                  |
+|                                   |                                   |   GLOBAL_THREAD                    |                                  |
+|                                   |                                   | }                                  |                                  |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_stream { }               |                                   | struct {                           |                                  |
+|                                   |                                   |   struct gpio_callback;            |                                  |
+|                                   |                                   |   const struct device *;           |                                  |
+|                                   |                                   |   struct rtio_iodev_sqe *;         |                                  |
+|                                   |                                   |   struct { ... } settings;         |                                  |
+|                                   |                                   |   struct { ... } data;             |                                  |
+|                                   |                                   | }                                  |                                  |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_data { }                 | icm42688_dev_data { }             | struct icm45686_data {             | struct icm42688_dev_data {       |
+|                                   |                                   |   struct {                         |   struct icm42688_cfg            |
+|                                   |                                   |     struct rtio_iodev *iodev;      |  [cond]                          |
+|                                   |                                   |     struct rtio *ctx;              |   OWN_THREAD                     |
+|                                   |                                   |     enum icm45686_bus_type type;   |  [cond]                          |
+|                                   |                                   |    [cond]                          |   GLOBAL_THREAD                  |
+|                                   |                                   |     struct { ... } i3c;            |  [cond]                          |
+|                                   |                                   |   } rtio;                          |   struct rtio_iodev_sqe *stream; |
+|                                   |                                   |   struct icm45686_encoded_data;    |   struct rtio *r;                |
+|                                   |                                   |  [cond]                            |   struct rtio_iodev *spi_dev;    |
+|                                   |                                   |   struct icm45686_triggers;        |   uint8_t int_status;            |
+|                                   |                                   |  [cond]                            |   uint16_t fifo_count;           |
+|                                   |                                   |   struct icm45686_stream;          |   uint64_t timestamp;            |
+|                                   |                                   | }                                  |   atomic_t reading_fifo;         |
+|                                   |                                   |                                    | }                                |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+| icm45686_config { }               | icm42688_cfg { }                  | sensor config, gpio interrupt pin  | sensor config                    |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+|                                   | icm42688_dev_cfg { }              |                                    | spi_dt_spec,                     |
+|                                   |                                   |                                    | gpio interrupts                  |
+|:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
+|                                   | alignment { }                     |                                    | part of sensor                   |
+|                                   |                                   |                                    | config                           |
+```
+
+Some take-aways from the table of 45686 and 42688 driver structs:
+
+- both drivers declare
+  1. struct rtio_iodev_sqe *
+  2. struct rtio *
+  3. struct rtio_iodev *
+- both drivers declare and define sensor trigger (interrupt) structs and trigger callbacks.
+- ICM45686 factors RTIO details in two structs, ICM42688 factors RTIO into one struct
+
+There is no I2C support in the ICM42688 driver code base.
+
+## Bus Read and Write Functions, ICM45686
+
 In [icm45686.c](https://github.com/zephyrproject-rtos/zephyr/blob/413b789deb391d3a37d06b463288a5fe765ee57e/drivers/sensor/tdk/icm45686/icm45686.c "ICM45686 driver source icm45686.c") the functions ``static inline int reg_read()`` and ``static inline int reg_write()`` are wrappers to ``icm45686_bus_read()`` and ``icm45686_bus_write()``.  Overall icm45686.c contains the functions:
 
 - static inline int reg_write(const struct device *dev, uint8_t reg, uint8_t val)
