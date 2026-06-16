@@ -241,4 +241,142 @@ ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm45686$ 
 
 ## How ICM42688 Driver Transacts On Bus
 
+Now it is worth looking at how the ICM42688 driver communicates, which is to say
+prepares its messages to send and to transact for write-read message via the
+RTIO subsystem.  This driver has a SPI bus API source file with five functions:
+
+```
+- static inline int spi_write_register(const struct spi_dt_spec *bus, uint8_t reg, uint8_t data);
+- static inline int spi_read_register(const struct spi_dt_spec *bus, uint8_t reg, uint8_t *data, len);
+- int icm42688_spi_read(const struct spi_dt_spec *bus, uint16_t reg, uint8_t *data, size_t len)
+- int icm42688_spi_update_register(const struct spi_dt_spec *bus, uint16_t reg, uint8_t mask,
+- int icm42688_spi_single_write(const struct spi_dt_spec *bus, uint16_t reg, uint8_t data)
+```
+
+There are a lot of places where various ICM42688 driver sources call some of
+these SPI APIs:
+
+```
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm42688$ grep -n '^int ' icm42688_spi.c
+66:int icm42688_spi_read(const struct spi_dt_spec *bus, uint16_t reg, uint8_t *data, size_t len)
+76:int icm42688_spi_update_register(const struct spi_dt_spec *bus, uint16_t reg, uint8_t mask,
+92:int icm42688_spi_single_write(const struct spi_dt_spec *bus, uint16_t reg, uint8_t data)
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm42688$ vi icm42688_spi.c
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm42688$ grep -n icm42688_spi_ ./*.*
+./icm42688.c:111:	int res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+./icm42688.c:339:	SPI_DT_IODEV_DEFINE(icm42688_spi_iodev_##inst, DT_DRV_INST(inst), ICM42688_SPI_CFG, 0U);   \
+./icm42688.c:372:						    .spi_iodev = &icm42688_spi_iodev_##inst,))     \
+./icm42688_common.c:31:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_DEVICE_CONFIG, BIT_SOFT_RESET_CONFIG);
+./icm42688_common.c:42:	res = icm42688_spi_read(&dev_cfg->spi, REG_INT_STATUS, &value, 1);
+./icm42688_common.c:53:	res = icm42688_spi_read(&dev_cfg->spi, REG_WHO_AM_I, &value, 1);
+./icm42688_common.c:129:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_INT_SOURCE0, 0);
+./icm42688_common.c:133:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_FIFO_CONFIG,
+./icm42688_common.c:141:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_SIGNAL_PATH_RESET,
+./icm42688_common.c:153:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_BANK_SEL, BIT_BANK1);
+./icm42688_common.c:164:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_INTF_CONFIG5, intf_config5);
+./icm42688_common.c:171:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_BANK_SEL, BIT_BANK0);
+./icm42688_common.c:181:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_INTF_CONFIG1, intf_config1);
+./icm42688_common.c:193:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_PWR_MGMT0, pwr_mgmt0);
+./icm42688_common.c:209:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_ACCEL_CONFIG0, accel_config0);
+./icm42688_common.c:219:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_GYRO_CONFIG0, gyro_config0);
+./icm42688_common.c:235:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_FIFO_CONFIG, fifo_config_bypass);
+./icm42688_common.c:244:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_FSYNC_CONFIG, 0);
+./icm42688_common.c:249:	res = icm42688_spi_read(&dev_cfg->spi, REG_TMST_CONFIG, &tmst_config, 1);
+./icm42688_common.c:254:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_TMST_CONFIG, tmst_config & ~BIT(1));
+./icm42688_common.c:264:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_INT_CONFIG,
+./icm42688_common.c:280:	res = icm42688_spi_single_write(&dev_cfg->spi, REG_INT_CONFIG1, int_config1);
+./icm42688_common.c:303:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_FIFO_CONFIG1, fifo_cfg1);
+./icm42688_common.c:314:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_FIFO_CONFIG2, fifo_wml);
+./icm42688_common.c:323:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_FIFO_CONFIG3, fifo_wmh);
+./icm42688_common.c:333:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_FIFO_CONFIG, fifo_config);
+./icm42688_common.c:339:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_INT_SOURCE0, int_source0);
+./icm42688_common.c:350:		res = icm42688_spi_single_write(&dev_cfg->spi, REG_INT_SOURCE0, int_source0);
+./icm42688_common.c:378:	res = icm42688_spi_read(&dev_cfg->spi, REG_TEMP_DATA1, data, 14);
+./icm42688_rtio.c:25:	int res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+./icm42688_spi.c:66:int icm42688_spi_read(const struct spi_dt_spec *bus, uint16_t reg, uint8_t *data, size_t len)
+./icm42688_spi.c:76:int icm42688_spi_update_register(const struct spi_dt_spec *bus, uint16_t reg, uint8_t mask,
+./icm42688_spi.c:80:	int res = icm42688_spi_read(bus, reg, &temp, 1);
+./icm42688_spi.c:89:	return icm42688_spi_single_write(bus, reg, temp);
+./icm42688_spi.c:92:int icm42688_spi_single_write(const struct spi_dt_spec *bus, uint16_t reg, uint8_t data)
+./icm42688_spi.h:24:int icm42688_spi_single_write(const struct spi_dt_spec *bus, uint16_t reg, uint8_t data);
+./icm42688_spi.h:38:int icm42688_spi_update_register(const struct spi_dt_spec *bus, uint16_t reg, uint8_t mask,
+./icm42688_spi.h:53:int icm42688_spi_read(const struct spi_dt_spec *bus, uint16_t reg, uint8_t *data, size_t len);
+./icm42688_trigger.c:102:		res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+./icm42688_trigger.c:159:	res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG,
+./icm42688_trigger.c:166:	res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG1, 0);
+./icm42688_trigger.c:183:	return icm42688_spi_single_write(&cfg->spi, REG_INT_SOURCE0, value);
+```
+
+Most likely these calls to SPI read and write APIs will need to be redirected to
+a more general bus read and write API pair, as in the ICM42688 driver.
+
+Driver ICM45686 bus read and write functions are found in [icm45686_bus.h](https://github.com/zephyrproject-rtos/zephyr/blob/main/drivers/sensor/tdk/icm45686/icm45686_bus.h).  These functions are:
+
+```
+ 17 static inline int icm45686_bus_read(const struct device *dev,
+ 18                                     uint8_t reg,
+ 19                                     uint8_t *buf,
+ 20                                     uint16_t len)
+ 21 { . . .
+
+ 61 static inline int icm45686_bus_write(const struct device *dev,
+ 62                                      uint8_t reg,
+ 63                                      const uint8_t *buf,
+ 64                                      uint16_t len)
+ 65 {
+```
+
+These two bus communication APIs are called from icm45686.c, icm45686_stream.c and ism45686_trigger.c:
+
+```c
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm45686$ grep -n icm45686_bus_read ./*
+./icm45686_bus.h:17:static inline int icm45686_bus_read(const struct device *dev,
+./icm45686.c:39:	return icm45686_bus_read(dev, reg, val, 1);
+./icm45686.c:53:	err = icm45686_bus_read(dev,
+./icm45686_stream.c:543:		err = icm45686_bus_read(dev, REG_INT1_STATUS0, &val, 1);
+./icm45686_trigger.c:85:	err = icm45686_bus_read(dev, REG_INT1_CONFIG0, &val, 1);
+
+ted@zakia:~/projects/oresat/oresat-firmware/zephyr/drivers/sensor/tdk/icm45686$ grep -n icm45686_bus_write ./*
+./icm45686_bus.h:61:static inline int icm45686_bus_write(const struct device *dev,
+./icm45686.c:34:	return icm45686_bus_write(dev, reg, &val, 1);
+./icm45686.c:352:	err = icm45686_bus_write(dev, REG_IREG_ADDR_15_8, gyro_lpf_write_array,
+./icm45686.c:370:	err = icm45686_bus_write(dev, REG_IREG_ADDR_15_8, accel_lpf_write_array,
+./icm45686_stream.c:534:		err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_stream.c:555:		err = icm45686_bus_write(dev, REG_FIFO_CONFIG3, &val, 1);
+./icm45686_stream.c:566:		err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_stream.c:576:		err = icm45686_bus_write(dev, REG_FIFO_CONFIG0, &val, 1);
+./icm45686_stream.c:591:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG2, &val, 1);
+./icm45686_stream.c:599:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG1_0, (uint8_t *)&fifo_ths, 2);
+./icm45686_stream.c:609:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG0, &val, 1);
+./icm45686_stream.c:621:			err = icm45686_bus_write(dev, REG_FIFO_CONFIG3, &val, 1);
+./icm45686_stream.c:672:		err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_stream.c:680:		err = icm45686_bus_write(dev, REG_INT1_CONFIG2, &val, 1);
+./icm45686_trigger.c:91:	err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_trigger.c:100:	return icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_trigger.c:200:	err = icm45686_bus_write(dev, REG_INT1_CONFIG0, &val, 1);
+./icm45686_trigger.c:208:	err = icm45686_bus_write(dev, REG_INT1_CONFIG2, &val, 1);
+```
+
+
+
+## RTIO Constructs
+
+Driver ICM42688 makes use of an RTIO construct defined in ``zephyr/include/zephyr/drivers/sensor.``:
+
+```
+/*
+ * Internal data structure used to store information about the IODevice for async reading and
+ * streaming sensor data.
+ */
+struct sensor_read_config {
+        const struct device *sensor;
+        const bool is_streaming;
+        union {
+                struct sensor_chan_spec *const channels;
+                struct sensor_stream_trigger *const triggers;
+        };
+        size_t count;
+        const size_t max; 
+};
+```
 
