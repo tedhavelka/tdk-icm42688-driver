@@ -11,6 +11,7 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/sensor/icm42688.h>
 #include <zephyr/drivers/spi.h>
+#include <zephyr/drivers/i2c.h>
 #include <zephyr/sys/byteorder.h>
 
 #include "icm42688.h"
@@ -108,7 +109,8 @@ static int icm42688_sample_fetch(const struct device *dev, enum sensor_channel c
 	struct icm42688_dev_data *data = dev->data;
 	const struct icm42688_dev_cfg *cfg = dev->config;
 
-	int res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+	// int res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+	int res = icm42688_bus_read(dev, REG_INT_STATUS, &status, 1);
 
 	if (res) {
 		return res;
@@ -289,7 +291,7 @@ static DEVICE_API(sensor, icm42688_driver_api) = {
 
 int icm42688_init(const struct device *dev)
 {
-	struct icm42688_dev_data *data = dev->data;
+	// struct icm42688_dev_data *data = dev->data;
 	const struct icm42688_dev_cfg *cfg = dev->config;
 	int res;
 
