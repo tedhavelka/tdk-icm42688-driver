@@ -332,15 +332,10 @@ struct icm42688_trigger_entry {
  * @brief Device data (struct device)
  */
 struct icm42688_dev_data {
+	// TODO [ ] Determine whether device config should be nested within device dev data:
 	struct icm42688_cfg cfg;
-#ifdef CONFIG_ORESAT_ICM42688_TRIGGER
-#if defined(CONFIG_ORESAT_ICM42688_TRIGGER_OWN_THREAD)
-	K_KERNEL_STACK_MEMBER(thread_stack, CONFIG_ORESAT_ICM42688_THREAD_STACK_SIZE);
-	struct k_thread thread;
-	struct k_sem gpio_sem;
-#elif defined(CONFIG_ORESAT_ICM42688_TRIGGER_GLOBAL_THREAD)
-	struct k_work work;
-#endif
+	// TODO [ ] Confirm refactor of stream members to move them outside of trigger
+	//          dependency:
 #ifdef CONFIG_ORESAT_ICM42688_STREAM
 	struct rtio_iodev_sqe *streaming_sqe;
 	struct rtio *ctx;
@@ -351,6 +346,14 @@ struct icm42688_dev_data {
 	uint64_t timestamp;
 	atomic_t reading_fifo;
 #endif /* CONFIG_ORESAT_ICM42688_STREAM */
+#ifdef CONFIG_ORESAT_ICM42688_TRIGGER
+#if defined(CONFIG_ORESAT_ICM42688_TRIGGER_OWN_THREAD)
+	K_KERNEL_STACK_MEMBER(thread_stack, CONFIG_ORESAT_ICM42688_THREAD_STACK_SIZE);
+	struct k_thread thread;
+	struct k_sem gpio_sem;
+#elif defined(CONFIG_ORESAT_ICM42688_TRIGGER_GLOBAL_THREAD)
+	struct k_work work;
+#endif
 	const struct device *dev;
 	struct gpio_callback gpio_cb;
 	sensor_trigger_handler_t data_ready_handler;
@@ -358,6 +361,7 @@ struct icm42688_dev_data {
 	struct k_mutex mutex;
 #endif /* CONFIG_ORESAT_ICM42688_TRIGGER */
 
+	// TODO [ ] Compare readings struct member with 45686 encoded data 'edata' member:
 	int16_t readings[7];
 };
 
