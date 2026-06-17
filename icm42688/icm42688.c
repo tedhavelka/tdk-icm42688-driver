@@ -431,7 +431,7 @@ void icm42688_unlock(const struct device *dev)
 			.iodev = &icm_42688_bus_##inst,                                            \
 			.ctx = &icm_42688_rtio_ctx_##inst,                                         \
 			COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                 \
-				(.type = ICM42688_BUS_SPI), ())                                 \
+				(.type = ICM42688_BUS_I2C), ())                                 \
 			COND_CODE_1(DT_INST_ON_BUS(inst, spi),                                     \
 				(.type = ICM45686_BUS_SPI), ())                                    \
 		},                                                                                 \

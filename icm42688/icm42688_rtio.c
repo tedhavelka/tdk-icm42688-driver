@@ -5,14 +5,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <zephyr/drivers/sensor.h>
-#include <zephyr/rtio/work.h>
 #include "icm42688.h"
 #include "icm42688_decoder.h"
 #include "icm42688_reg.h"
 #include "icm42688_rtio.h"
 #include "icm42688_spi.h"
 
+#include <icm45686_bus.h>
+
+#include <zephyr/drivers/sensor.h>
+#include <zephyr/rtio/work.h>
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ICM42688_RTIO, CONFIG_SENSOR_LOG_LEVEL);
 
@@ -22,7 +24,15 @@ static int icm42688_rtio_sample_fetch(const struct device *dev, int16_t readings
 	const struct icm42688_dev_cfg *cfg = dev->config;
 	uint8_t *buffer = (uint8_t *)readings;
 
-	int res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+	// TODO [ ] Implement icm42688_bus_read(const struct device *dev, uint8_t reg, uint8_t *buf, uint16_t len)
+	//          and replace following SPI only function call with call to above:
+	//
+	// int res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+	//           ^^^^^^^^^^^^^^^^^
+	// Note:  the replaced function has signature:
+	//  int icm42688_spi_read(const struct spi_dt_spec *bus, uint16_t reg, uint8_t *data, size_t len); 
+
+	int res = icm42688_bus_read(dev, REG_INT_STATUS, &status, 1);
 
 	if (res) {
 		return res;
