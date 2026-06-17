@@ -15,8 +15,6 @@ menuconfig ORESAT_ICM42688
 	select SPI_RTIO if $(dt_compat_on_bus,$(DT_COMPAT_ORESAT_ICM42688),spi)
 	select I2C if $(dt_compat_on_bus,$(DT_COMPAT_ORESAT_ICM42688),i2c)
 	select I2C_RTIO if $(dt_compat_on_bus,$(DT_COMPAT_ORESAT_ICM42688),i2c)
-	# select I3C if $(dt_compat_on_bus,$(DT_COMPAT_ORESAT_ICM42688),i3c)
-	# select I3C_RTIO if $(dt_compat_on_bus,$(DT_COMPAT_ORESAT_ICM42688),i3c)
 	select RTIO_WORKQ if SENSOR_ASYNC_API
 	help
 	  Enable driver for ICM42688 six-axis motion tracking device.
@@ -65,9 +63,9 @@ endchoice
 
 config ORESAT_ICM42688_STREAM
 	bool "Use hardware FIFO to stream data"
-	select ORESAT_ICM42688_TRIGGER
+	# select ORESAT_ICM42688_TRIGGER
 	default y
-	depends on SPI_RTIO
+	# depends on SPI_RTIO
 	depends on SENSOR_ASYNC_API
 	help
 	  Use this config option to enable streaming sensor data via RTIO subsystem.

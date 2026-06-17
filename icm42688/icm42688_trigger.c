@@ -4,17 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <zephyr/device.h>
-#include <zephyr/drivers/sensor.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/logging/log.h>
-#include <zephyr/sys/util.h>
-
 #include "icm42688.h"
 #include "icm42688_reg.h"
 #include "icm42688_rtio.h"
 #include "icm42688_spi.h"
 #include "icm42688_trigger.h"
+#include <icm42688-bus.h>
+
+#include <zephyr/device.h>
+#include <zephyr/drivers/sensor.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/util.h>
 
 LOG_MODULE_DECLARE(ICM42688, CONFIG_SENSOR_LOG_LEVEL);
 
@@ -99,7 +100,8 @@ int icm42688_trigger_set(const struct device *dev, const struct sensor_trigger *
 		data->data_ready_handler = handler;
 		data->data_ready_trigger = trig;
 
-		res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+		// res = icm42688_spi_read(&cfg->spi, REG_INT_STATUS, &status, 1);
+		res = icm42688_bus_read(dev, REG_INT_STATUS, &status, 1);
 		break;
 	default:
 		res = -ENOTSUP;
@@ -154,16 +156,21 @@ int icm42688_trigger_enable_interrupt(const struct device *dev, struct icm42688_
 {
 	int res;
 	const struct icm42688_dev_cfg *cfg = dev->config;
+	uint8_t buf[1] = (BIT_INT1_DRIVE_CIRCUIT | BIT_INT1_POLARITY);
 
 	/* pulse-mode (auto clearing), push-pull and active-high */
-	res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG,
-					BIT_INT1_DRIVE_CIRCUIT | BIT_INT1_POLARITY);
+	// res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG,
+	//				BIT_INT1_DRIVE_CIRCUIT | BIT_INT1_POLARITY);
+	res = icm42688_bus_write(dev, REG_INT_CONFIG, &buf, 1);
+	
 	if (res != 0) {
 		return res;
 	}
 
 	/* Deassert async reset for proper INT pin operation, see datasheet 14.50 */
-	res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG1, 0);
+	// res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG1, 0);
+	buf[0] = 0;
+	res = icm42688_bus_write(dev, REG_INT_CONFIG1, &buf, 0);
 	if (res != 0) {
 		return res;
 	}
@@ -180,7 +187,8 @@ int icm42688_trigger_enable_interrupt(const struct device *dev, struct icm42688_
 	if (new_cfg->interrupt1_fifo_full) {
 		value |= FIELD_PREP(BIT_FIFO_FULL_INT1_EN, 1);
 	}
-	return icm42688_spi_single_write(&cfg->spi, REG_INT_SOURCE0, value);
+	// return icm42688_spi_single_write(&cfg->spi, REG_INT_SOURCE0, value);
+	return icm42688_bus_write(dev, REG_INT_SOURCE0, value, 1);
 }
 
 void icm42688_lock(const struct device *dev)
