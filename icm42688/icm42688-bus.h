@@ -11,10 +11,10 @@ static inline int icm42688_bus_read(const struct device *dev,
 				    uint8_t *buf,
 				    uint16_t len)
 {
-	struct icm42688_data *data = dev->data;
-	// TODO [x] check 'struct icm42688_data' has a member named 'rtio':
-	struct rtio *ctx = data->rtio.ctx;
-	struct rtio_iodev *iodev = data->rtio.iodev;
+	struct icm42688_dev_data *data = dev->data;
+	// TODO [x] check 'struct icm42688_dev_data' has a member named 'rtio':
+	struct rtio *ctx = data->ctx;
+	struct rtio_iodev *iodev = data->iodev;
 	// RTIO submission and completion queue constructs:
 	struct rtio_sqe *write_sqe = rtio_sqe_acquire(ctx);
 	struct rtio_sqe *read_sqe = rtio_sqe_acquire(ctx);
@@ -59,7 +59,7 @@ static inline int icm42688_bus_write(const struct device *dev,
 				     const uint8_t *buf,
 				     uint16_t len)
 {
-	struct icm42688_data *data = dev->data;
+	struct icm42688_dev_data *data = dev->data;
 	struct rtio *ctx = data->rtio.ctx;
 	struct rtio_iodev *iodev = data->rtio.iodev;
 	// RTIO submission and completion queue constructs:

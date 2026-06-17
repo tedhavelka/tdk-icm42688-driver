@@ -301,13 +301,13 @@ int icm42688_init(const struct device *dev)
 #endif
 
 #if CONFIG_I2C_RTIO
-	if ((data->rtio.type == ICM42688_BUS_I2C) && !i2c_is_ready_iodev(data->rtio.iodev)) {
+	if ((data->type == ICM42688_BUS_I2C) && !i2c_is_ready_iodev(data->iodev)) {
 		LOG_ERR("I2C bus is not ready");
 		return -ENODEV;
 	}
 #endif
 #if CONFIG_SPI_RTIO
-	if ((data->rtio.type == ICM42688_BUS_SPI) && !spi_is_ready_iodev(data->rtio.iodev)) {
+	if ((data->type == ICM42688_BUS_SPI) && !spi_is_ready_iodev(data->iodev)) {
 		LOG_ERR("SPI bus is not ready");
 		return -ENODEV;
 	}
@@ -424,17 +424,17 @@ void icm42688_unlock(const struct device *dev)
 	static const struct icm42688_dev_cfg icm42688_cfg_##inst = {                               \
 		.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}),                     \
 	};                                                                                    \
-                                                                                \
-	/* Note 'icm42688_dev_data' was named 'icm42688_dev_data': */                            \
-	static struct icm42688_data icm42688_data_##inst = {                                       \
-		.rtio = {                                                                         \
+                                                                                                   \
+	/* Note 'icm42688_dev_data' was named 'icm42688_dev_data': */                              \
+	static struct icm42688_dev_data icm42688_dev_data_##inst = {                               \
+		/* .rtio = { */                                                                      \
 			.iodev = &icm_42688_bus_##inst,                                            \
 			.ctx = &icm_42688_rtio_ctx_##inst,                                         \
-			COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                 \
-				(.type = ICM42688_BUS_I2C), ())                                 \
+			COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                     \
+				(.type = ICM42688_BUS_I2C), ())                                    \
 			COND_CODE_1(DT_INST_ON_BUS(inst, spi),                                     \
 				(.type = ICM45686_BUS_SPI), ())                                    \
-		},                                                                                 \
+		/* }, */                                                                             \
 	};                                                                                         \
 		                                                                                   \
 	SENSOR_DEVICE_DT_INST_DEFINE(inst, icm42688_init,                                          \

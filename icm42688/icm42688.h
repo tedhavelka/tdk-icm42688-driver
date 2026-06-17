@@ -345,6 +345,7 @@ struct icm42688_dev_data {
 	struct rtio_iodev_sqe *streaming_sqe;
 	struct rtio *ctx;
 	struct rtio_iodev *iodev;
+	enum icm42688_bus_type type;
 	uint8_t int_status;
 	uint16_t fifo_count;
 	uint64_t timestamp;

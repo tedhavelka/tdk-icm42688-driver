@@ -11,7 +11,9 @@
 #include <zephyr/sys/util.h>
 
 /* Address value has a read bit */
+// TODO [ ] Check whether REG_SPI_READ_BIT can be removed:
 #define REG_SPI_READ_BIT BIT(7)
+#define REG_READ_BIT BIT(7)
 
 /* Common bank select register and values */
 #define REG_BANK_SEL  0x76
