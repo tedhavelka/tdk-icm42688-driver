@@ -6,15 +6,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <zephyr/drivers/sensor.h>
-#include <zephyr/drivers/sensor/icm42688.h>
-#include <zephyr/drivers/spi.h>
-#include <zephyr/sys/byteorder.h>
 #include "icm42688.h"
 #include "icm42688_reg.h"
 #include "icm42688_spi.h"
 #include "icm42688_trigger.h"
 
+#include <icm42688-bus.h>
+
+#include <zephyr/drivers/sensor.h>
+#include <zephyr/drivers/sensor/icm42688.h>
+#include <zephyr/drivers/spi.h>
+#include <zephyr/sys/byteorder.h>
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ICM42688_LL, CONFIG_SENSOR_LOG_LEVEL);
 
@@ -375,7 +377,8 @@ int icm42688_read_all(const struct device *dev, uint8_t data[14])
 	const struct icm42688_dev_cfg *dev_cfg = dev->config;
 	int res;
 
-	res = icm42688_spi_read(&dev_cfg->spi, REG_TEMP_DATA1, data, 14);
+	// res = icm42688_spi_read(&dev_cfg->spi, REG_TEMP_DATA1, data, 14);
+	res = icm42688_bus_read(dev, REG_TEMP_DATA1, data, 14);
 
 	return res;
 }

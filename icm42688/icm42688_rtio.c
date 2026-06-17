@@ -11,7 +11,7 @@
 #include "icm42688_rtio.h"
 #include "icm42688_spi.h"
 
-#include <icm45686_bus.h>
+#include <icm42688-bus.h>
 
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/rtio/work.h>
