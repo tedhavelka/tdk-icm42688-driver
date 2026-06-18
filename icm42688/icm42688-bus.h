@@ -1,10 +1,12 @@
 #ifndef ORESAT_DRIVER_SENSOR_ICM42688_BUS_H
 #define ORESAT_DRIVER_SENSOR_ICM42688_BUS_H
 
-#include <zephyr/rtio/rtio.h>
-
 #include "icm42688.h"
 #include "icm42688_reg.h"
+
+#include <zephyr/rtio/rtio.h>
+
+#define BYTE_COUNT_ONE 1
 
 static inline int icm42688_bus_read(const struct device *dev,
 				    uint8_t reg,
@@ -33,7 +35,7 @@ static inline int icm42688_bus_read(const struct device *dev,
 	rtio_sqe_prep_write(write_sqe, iodev, RTIO_PRIO_HIGH, &reg, 1, NULL);
 	write_sqe->flags |= RTIO_SQE_TRANSACTION;
 	rtio_sqe_prep_read(read_sqe, iodev, RTIO_PRIO_HIGH, buf, len, NULL);
-	if (data->rtio.type == ICM42688_BUS_I2C) {
+	if (data->type == ICM42688_BUS_I2C) {
 		read_sqe->iodev_flags |= RTIO_IODEV_I2C_STOP | RTIO_IODEV_I2C_RESTART;
 	}
 
@@ -60,8 +62,8 @@ static inline int icm42688_bus_write(const struct device *dev,
 				     uint16_t len)
 {
 	struct icm42688_dev_data *data = dev->data;
-	struct rtio *ctx = data->rtio.ctx;
-	struct rtio_iodev *iodev = data->rtio.iodev;
+	struct rtio *ctx = data->ctx;
+	struct rtio_iodev *iodev = data->iodev;
 	// RTIO submission and completion queue constructs:
 	struct rtio_sqe *write_reg_sqe = rtio_sqe_acquire(ctx);
 	struct rtio_sqe *write_buf_sqe = rtio_sqe_acquire(ctx);
@@ -76,7 +78,7 @@ static inline int icm42688_bus_write(const struct device *dev,
 	rtio_sqe_prep_write(write_reg_sqe, iodev, RTIO_PRIO_HIGH, &reg, 1, NULL);
 	write_reg_sqe->flags |= RTIO_SQE_TRANSACTION;
 	rtio_sqe_prep_write(write_buf_sqe, iodev, RTIO_PRIO_HIGH, buf, len, NULL);
-	if (data->rtio.type == ICM42688_BUS_I2C) {
+	if (data->type == ICM42688_BUS_I2C) {
 		write_buf_sqe->iodev_flags |= RTIO_IODEV_I2C_STOP;
 	}
 
@@ -88,7 +90,7 @@ static inline int icm42688_bus_write(const struct device *dev,
 	do {
 		cqe = rtio_cqe_consume(ctx);
 		if (cqe != NULL) {
-			err = cqe->result;
+			rc = cqe->result;
 			rtio_cqe_release(ctx, cqe);
 		}
 	} while (cqe != NULL);

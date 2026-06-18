@@ -301,7 +301,7 @@ void icm42688_fifo_event(const struct device *dev)
 {
 	struct icm42688_dev_data *drv_data = dev->data;
 	struct rtio_iodev *spi_iodev = drv_data->spi_iodev;
-	struct rtio *r = drv_data->r;
+	struct rtio *r = drv_data->ctx;
 	uint64_t cycles;
 	int rc;
 

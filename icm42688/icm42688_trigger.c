@@ -161,7 +161,7 @@ int icm42688_trigger_enable_interrupt(const struct device *dev, struct icm42688_
 	/* pulse-mode (auto clearing), push-pull and active-high */
 	// res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG,
 	//				BIT_INT1_DRIVE_CIRCUIT | BIT_INT1_POLARITY);
-	res = icm42688_bus_write(dev, REG_INT_CONFIG, &buf, 1);
+	res = icm42688_bus_write(dev, REG_INT_CONFIG, &buf, BYTE_COUNT_ONE);
 	
 	if (res != 0) {
 		return res;
@@ -170,7 +170,7 @@ int icm42688_trigger_enable_interrupt(const struct device *dev, struct icm42688_
 	/* Deassert async reset for proper INT pin operation, see datasheet 14.50 */
 	// res = icm42688_spi_single_write(&cfg->spi, REG_INT_CONFIG1, 0);
 	buf[0] = 0;
-	res = icm42688_bus_write(dev, REG_INT_CONFIG1, &buf, 0);
+	res = icm42688_bus_write(dev, REG_INT_CONFIG1, &buf, BYTE_COUNT_ONE);
 	if (res != 0) {
 		return res;
 	}
@@ -188,7 +188,7 @@ int icm42688_trigger_enable_interrupt(const struct device *dev, struct icm42688_
 		value |= FIELD_PREP(BIT_FIFO_FULL_INT1_EN, 1);
 	}
 	// return icm42688_spi_single_write(&cfg->spi, REG_INT_SOURCE0, value);
-	return icm42688_bus_write(dev, REG_INT_SOURCE0, value, 1);
+	return icm42688_bus_write(dev, REG_INT_SOURCE0, value, BYTE_COUNT_ONE);
 }
 
 void icm42688_lock(const struct device *dev)

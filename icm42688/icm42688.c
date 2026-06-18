@@ -293,15 +293,8 @@ static DEVICE_API(sensor, icm42688_driver_api) = {
 int icm42688_init(const struct device *dev)
 {
 	struct icm42688_dev_data *data = dev->data;
-	const struct icm42688_dev_cfg *cfg = dev->config;
+	// const struct icm42688_dev_cfg *cfg = dev->config;
 	int res;
-
-#if 0
-	if (!spi_is_ready_dt(&cfg->spi)) {
-		LOG_ERR("SPI bus is not ready");
-		return -ENODEV;
-	}
-#endif
 
 #if CONFIG_I2C_RTIO
 	if ((data->type == ICM42688_BUS_I2C) && !i2c_is_ready_iodev(data->iodev)) {
@@ -394,7 +387,7 @@ void icm42688_unlock(const struct device *dev)
 		IF_ENABLED(CONFIG_ICM42688_STREAM, (.r = &icm42688_rtio_##inst,                    \
 						    .spi_iodev = &icm42688_spi_iodev_##inst,))     \
 	};
-#endif 0
+#endif // 0
 
 #define ICM42688_INIT(inst)                                                                        \
 	                                                                                        \

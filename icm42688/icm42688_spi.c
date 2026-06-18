@@ -94,6 +94,9 @@ int icm42688_spi_single_write(const struct spi_dt_spec *bus, uint16_t reg, uint8
 	int res = 0;
 	uint8_t address = FIELD_GET(REG_ADDRESS_MASK, reg);
 
+// From zephyr/include/zephyr/sys/util_macro.h FIELD_GET() defined as:
+// #define FIELD_GET(mask, value)  (((value) & (mask)) / LSB_GET(mask))
+
 	res = spi_write_register(bus, address, data);
 
 	return res;
