@@ -377,7 +377,7 @@ void icm42688_unlock(const struct device *dev)
 		.axis_align[0].sign = DT_INST_PROP(inst, axis_align_x_sign)-1,	\
 		.axis_align[1].sign = DT_INST_PROP(inst, axis_align_y_sign)-1,	\
 		.axis_align[2].sign = DT_INST_PROP(inst, axis_align_z_sign)-1	\
-	}
+	};
 
 #if 0 // because following code supports only SPI when RTIO streaming enabled:
 #define ICM42688_DEFINE_DATA(inst)                                                                 \
@@ -410,13 +410,13 @@ void icm42688_unlock(const struct device *dev)
 		(SPI_DT_IODEV_DEFINE(icm42688_bus_##inst,                             \
 				DT_DRV_INST(inst),                                    \
 				(ICM42688_SPI_CFG),                                   \
-				0U)),                                                \
+				0U)),                                                 \
 		());                                                                  \
 		                                                                      \
 	/* TODO [ ] Add `static const struct icm45686_config`:  */                    \
-	static const struct icm42688_config icm42688_cfg_##inst = {                   \
-		.settings = ICM42688_DT_CONFIG_INIT(inst),                            \
-	};                                                                            \
+	/* static const struct icm42688_config icm42688_cfg_##inst = { */             \
+	/* 	.settings = ICM42688_DT_CONFIG_INIT(inst),             */             \
+	/* };                                                          */             \
 		                                                                      \
 	static const struct icm42688_dev_cfg icm42688_cfg_##inst = {                  \
 		.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}),          \
@@ -424,8 +424,8 @@ void icm42688_unlock(const struct device *dev)
                                                                                       \
 	/* Note 'icm42688_dev_data' was named 'icm42688_dev_data': */                 \
 	static struct icm42688_dev_data icm42688_dev_data_##inst = {                  \
-		.iodev = &icm_42688_bus_##inst,                                       \
-		.ctx = &icm42688_rtio_##inst,                                    \
+		.iodev = &icm42688_bus_##inst,                                        \
+		.ctx = &icm42688_rtio_##inst,                                         \
 		COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                \
 			(.type = ICM42688_BUS_I2C), ())                               \
 		COND_CODE_1(DT_INST_ON_BUS(inst, spi),                                \
