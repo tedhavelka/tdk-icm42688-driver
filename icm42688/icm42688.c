@@ -389,56 +389,55 @@ void icm42688_unlock(const struct device *dev)
 	};
 #endif // 0
 
-#define ICM42688_INIT(inst)                                                                        \
-	                                                                                        \
-	/* 45686 has RTIO_DEFINE() here */                                                         \
-	IF_ENABLED(CONFIG_ICM42688_STREAM, (RTIO_DEFINE(icm42688_rtio_##inst, 8, 4));              \
-	                                                                                        \
-	/* ICM42688_DEFINE_DATA(inst); */                                                               \
-                                                                                                   \
-	/* static const struct icm42688_dev_cfg icm42688_cfg_##inst = {      */                    \
-	/*	.spi = SPI_DT_SPEC_INST_GET(inst, ICM42688_SPI_CFG, 0U),     */                    \
-	/*	.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}), */                    \
-	/* };                                                                */                    \
-                                                                                                   \
-	COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                                     \
-		(I2C_DT_IODEV_DEFINE(icm42688_bus_##inst,                                          \
-				DT_DRV_INST(inst))),                                               \
-		());                                                                               \
-        COND_CODE_1(DT_INST_ON_BUS(inst, spi),                                                     \
-		(SPI_DT_IODEV_DEFINE(icm42688_bus_##inst,                                          \
-				DT_DRV_INST(inst),                                                 \
-				(ICM42688_SPI_CFG),                                                \
+#define ICM42688_INIT(inst)                                                           \
+	                                                                              \
+	/* 45686 has RTIO_DEFINE() here */                                            \
+	/* IF_ENABLED(CONFIG_ICM42688_STREAM, (RTIO_DEFINE(icm42688_rtio_##inst, 8, 4)); */ \
+	RTIO_DEFINE(icm42688_rtio_##inst, 8, 4);                                      \
+	                                                                              \
+	/* ICM42688_DEFINE_DATA(inst); */                                             \
+                                                                                      \
+	/* static const struct icm42688_dev_cfg icm42688_cfg_##inst = {      */       \
+	/*	.spi = SPI_DT_SPEC_INST_GET(inst, ICM42688_SPI_CFG, 0U),     */       \
+	/*	.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}), */       \
+	/* };                                                                */       \
+                                                                                      \
+	COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                        \
+		(I2C_DT_IODEV_DEFINE(icm42688_bus_##inst,                             \
+				DT_DRV_INST(inst))),                                  \
+		());                                                                  \
+        COND_CODE_1(DT_INST_ON_BUS(inst, spi),                                        \
+		(SPI_DT_IODEV_DEFINE(icm42688_bus_##inst,                             \
+				DT_DRV_INST(inst),                                    \
+				(ICM42688_SPI_CFG),                                   \
 				0U)),                                                \
-		());                                                                               \
-		                                                                                   \
-	/* TODO [ ] Add `static const struct icm45686_config`:  */                               \
-	static const struct icm42688_config icm42688_cfg_##inst = {                                \
-		.settings = ICM42688_DT_CONFIG_INIT(inst),                                         \
-	};                                                                                         \
-		                                                                                   \
-	static const struct icm42688_dev_cfg icm42688_cfg_##inst = {                               \
-		.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}),                     \
-	};                                                                                    \
-                                                                                                   \
-	/* Note 'icm42688_dev_data' was named 'icm42688_dev_data': */                              \
-	static struct icm42688_dev_data icm42688_dev_data_##inst = {                               \
-		/* .rtio = { */                                                                      \
-			.iodev = &icm_42688_bus_##inst,                                            \
-			.ctx = &icm_42688_rtio_ctx_##inst,                                         \
-			COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                     \
-				(.type = ICM42688_BUS_I2C), ())                                    \
-			COND_CODE_1(DT_INST_ON_BUS(inst, spi),                                     \
-				(.type = ICM45686_BUS_SPI), ())                                    \
-		/* }, */                                                                             \
-	};                                                                                         \
-		                                                                                   \
-	SENSOR_DEVICE_DT_INST_DEFINE(inst, icm42688_init,                                          \
-				     NULL,                                                         \
-				     &icm42688_driver_##inst,                                      \
-				     &icm42688_cfg_##inst,                                         \
-				     POST_KERNEL,                                                  \
-				     CONFIG_SENSOR_INIT_PRIORITY,                                  \
+		());                                                                  \
+		                                                                      \
+	/* TODO [ ] Add `static const struct icm45686_config`:  */                    \
+	static const struct icm42688_config icm42688_cfg_##inst = {                   \
+		.settings = ICM42688_DT_CONFIG_INIT(inst),                            \
+	};                                                                            \
+		                                                                      \
+	static const struct icm42688_dev_cfg icm42688_cfg_##inst = {                  \
+		.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}),          \
+	};                                                                            \
+                                                                                      \
+	/* Note 'icm42688_dev_data' was named 'icm42688_dev_data': */                 \
+	static struct icm42688_dev_data icm42688_dev_data_##inst = {                  \
+		.iodev = &icm_42688_bus_##inst,                                       \
+		.ctx = &icm42688_rtio_##inst,                                    \
+		COND_CODE_1(DT_INST_ON_BUS(inst, i2c),                                \
+			(.type = ICM42688_BUS_I2C), ())                               \
+		COND_CODE_1(DT_INST_ON_BUS(inst, spi),                                \
+			(.type = ICM45686_BUS_SPI), ())                               \
+	};                                                                            \
+		                                                                      \
+	SENSOR_DEVICE_DT_INST_DEFINE(inst, icm42688_init,                             \
+				     NULL,                                            \
+				     &icm42688_driver_##inst,                         \
+				     &icm42688_cfg_##inst,                            \
+				     POST_KERNEL,                                     \
+				     CONFIG_SENSOR_INIT_PRIORITY,                     \
 				     &icm42688_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(ICM42688_INIT)

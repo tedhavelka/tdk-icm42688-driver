@@ -21,7 +21,7 @@ LOG_MODULE_REGISTER(ICM42688_RTIO, CONFIG_SENSOR_LOG_LEVEL);
 static int icm42688_rtio_sample_fetch(const struct device *dev, int16_t readings[7])
 {
 	uint8_t status;
-	const struct icm42688_dev_cfg *cfg = dev->config;
+	// const struct icm42688_dev_cfg *cfg = dev->config;
 	uint8_t *buffer = (uint8_t *)readings;
 
 	// TODO [ ] Implement icm42688_bus_read(const struct device *dev, uint8_t reg, uint8_t *buf, uint16_t len)
