@@ -418,9 +418,11 @@ void icm42688_unlock(const struct device *dev)
 		ICM42688_DT_CONFIG_INIT(inst)                                         \
 		                                                                      \
 	/* This struct holds gpios only */                                            \
-	static const struct icm42688_dev_cfg icm42688_dev_cfg_##inst = {              \
-		.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}),          \
-	};                                                                            \
+	/* TODO [ ] Determine how and where to use this struct in driver code, */      \
+	/*          build time warning says this struct not used anywhere.     */      \
+	/* static const struct icm42688_dev_cfg icm42688_dev_cfg_##inst = {     */         \
+	/*	.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}), */         \
+	/* }; */                                                                           \
                                                                                       \
 	/* Note 'icm42688_dev_data' was named 'icm42688_dev_data': */                 \
 	static struct icm42688_dev_data icm42688_dev_data_##inst = {                  \
