@@ -414,9 +414,9 @@ void icm42688_unlock(const struct device *dev)
 		());                                                                  \
 		                                                                      \
 	/* TODO [ ] Add `static const struct icm45686_config`:  */                    \
-	/* static const struct icm42688_config icm42688_cfg_##inst = { */             \
-	/* 	.settings = ICM42688_DT_CONFIG_INIT(inst),             */             \
-	/* };                                                          */             \
+	static const struct icm42688_config icm42688_cfg_##inst = {              \
+		.settings = ICM42688_DT_CONFIG_INIT(inst),                          \
+	};                                                                       \
 		                                                                      \
 	static const struct icm42688_dev_cfg icm42688_cfg_##inst = {                  \
 		.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}),          \
@@ -434,7 +434,8 @@ void icm42688_unlock(const struct device *dev)
 		                                                                      \
 	SENSOR_DEVICE_DT_INST_DEFINE(inst, icm42688_init,                             \
 				     NULL,                                            \
-				     &icm42688_driver_##inst,                         \
+				  /* &icm42688_driver_##inst, */                        \
+				     &icm42688_dev_data_##inst,                         \
 				     &icm42688_cfg_##inst,                            \
 				     POST_KERNEL,                                     \
 				     CONFIG_SENSOR_INIT_PRIORITY,                     \
