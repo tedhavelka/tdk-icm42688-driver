@@ -414,11 +414,11 @@ void icm42688_unlock(const struct device *dev)
 		());                                                                  \
 		                                                                      \
 	/* TODO [ ] Add `static const struct icm45686_config`:  */                    \
-	static const struct icm42688_config icm42688_cfg_##inst = {              \
-		.settings = ICM42688_DT_CONFIG_INIT(inst),                          \
-	};                                                                       \
+	static const struct icm42688_cfg icm42688_cfg_##inst =                        \
+		ICM42688_DT_CONFIG_INIT(inst)                                         \
 		                                                                      \
-	static const struct icm42688_dev_cfg icm42688_cfg_##inst = {                  \
+	/* This struct holds gpios only */                                            \
+	static const struct icm42688_dev_cfg icm42688_dev_cfg_##inst = {              \
 		.gpio_int1 = GPIO_DT_SPEC_INST_GET_OR(inst, int_gpios, {0}),          \
 	};                                                                            \
                                                                                       \
