@@ -150,8 +150,9 @@ int icm42688_configure(const struct device *dev, struct icm42688_cfg *cfg)
 
 		// res = icm42688_spi_single_write(&dev_cfg->spi, REG_SIGNAL_PATH_RESET,
 		//				FIELD_PREP(BIT_FIFO_FLUSH, 1));
+		uint8_t reg_signal_path_reset_val = FIELD_PREP(BIT_FIFO_FLUSH, 1);
 		res = icm42688_bus_write(dev, REG_SIGNAL_PATH_RESET,
-						FIELD_PREP(BIT_FIFO_FLUSH, 1), BYTE_COUNT_ONE);
+						&reg_signal_path_reset_val, BYTE_COUNT_ONE);
 
 		if (res != 0) {
 			LOG_ERR("Error flushing fifo");
@@ -163,7 +164,8 @@ int icm42688_configure(const struct device *dev, struct icm42688_cfg *cfg)
 
 	/* Select register bank 1 */
 	// res = icm42688_spi_single_write(&dev_cfg->spi, REG_BANK_SEL, BIT_BANK1);
-	res = icm42688_bus_write(dev, REG_BANK_SEL, BIT_BANK1, BYTE_COUNT_ONE);
+	uint8_t reg_bank_sel_val = BIT_BANK1;
+	res = icm42688_bus_write(dev, REG_BANK_SEL, &reg_bank_sel_val, BYTE_COUNT_ONE);
 	if (res != 0) {
 		LOG_ERR("Error selecting register bank 1");
 		return -EINVAL;
