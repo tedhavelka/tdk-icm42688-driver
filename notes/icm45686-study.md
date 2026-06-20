@@ -111,14 +111,14 @@ _Table 1 - driver structs for the 45686 and 42688 IMU devices_
 |:---------------------------------:|:---------------------------------:|:----------------------------------:|:--------------------------------:|
 |        ICM45686 structures        |        ICM42688 Structures        |      45686 struct content          |   42688 struct content           |
 |:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
-| icm45686_encoded_payload { }      | sensor data                       |                                    |                                  |
+| icm45686_encoded_payload { }      |                                   | sensor data                        |                                  |
 |:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
-| icm45686_encoded_fifo_payload { } | sensor data                       |                                    |                                  |
+| icm45686_encoded_fifo_payload { } |                                   | sensor data                        |                                  |
 |:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
-| icm45686_encoded_header {         | sensor data                       |                                    |                                  |
+| icm45686_encoded_header {         |                                   | sensor data                        |                                  |
 |:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
-| icm45686_encoded_data { }         | summary of first three            |                                    |                                  |
-|                                   | sensor data struct values         |                                    |                                  |
+| icm45686_encoded_data { }         |                                   | summary of first three             |                                  |
+|                                   |                                   | sensor data struct values          |                                  |
 |:----------------------------------|:----------------------------------|:-----------------------------------|:---------------------------------|
 | icm45686_triggers { }             | struct icm42688_trigger_entry { } | struct {                           | struct sensor_trigger trigger;   |
 |                                   |                                   |   struct gpio_callback;            | sensor_trigger_handler_t cb;     |
