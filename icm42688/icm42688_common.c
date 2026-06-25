@@ -27,7 +27,8 @@ int icm42688_reset(const struct device *dev)
 	// const struct icm42688_dev_cfg *dev_cfg = dev->config;
 
 	/* start up time for register read/write after POR is 1ms and supply ramp time is 3ms */
-	k_msleep(3);
+	k_msleep(50);
+	LOG_INF("M1");
 
 	/* perform a soft reset to ensure a clean slate, reset bit will auto-clear */
 	// res = icm42688_spi_single_write(&dev_cfg->spi, REG_DEVICE_CONFIG, BIT_SOFT_RESET_CONFIG);
@@ -42,6 +43,7 @@ int icm42688_reset(const struct device *dev)
 	/* wait for soft reset to take effect */
 	k_msleep(SOFT_RESET_TIME_MS);
 
+	LOG_INF("M2");
 	/* clear reset done int flag */
 	// res = icm42688_spi_read(&dev_cfg->spi, REG_INT_STATUS, &value, 1);
 	res = icm42688_bus_read(dev, REG_INT_STATUS, &value, 1);
@@ -55,6 +57,7 @@ int icm42688_reset(const struct device *dev)
 		return -EINVAL;
 	}
 
+	LOG_INF("M3");
 	// res = icm42688_spi_read(&dev_cfg->spi, REG_WHO_AM_I, &value, 1);
 	res = icm42688_bus_read(dev, REG_WHO_AM_I, &value, 1);
 	if (res) {
@@ -66,6 +69,7 @@ int icm42688_reset(const struct device *dev)
 		return -EINVAL;
 	}
 
+	LOG_INF("M4");
 	return 0;
 }
 
