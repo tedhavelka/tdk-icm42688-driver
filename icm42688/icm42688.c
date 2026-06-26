@@ -15,7 +15,7 @@
 #include "icm42688_spi.h"
 #include "icm42688_trigger.h"
 
-#include <icm42688-bus.h>
+// #include <icm42688-bus.h>
 
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/sensor/icm42688.h>
@@ -24,6 +24,8 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ICM42688, CONFIG_SENSOR_LOG_LEVEL);
+
+#include <icm42688-bus.h>
 
 static void icm42688_convert_accel(struct sensor_value *val, int16_t raw_val,
 				   struct icm42688_cfg *cfg)
