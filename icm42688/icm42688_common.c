@@ -36,7 +36,7 @@ int icm42688_reset(const struct device *dev)
 	res = icm42688_bus_write(dev, REG_DEVICE_CONFIG, &reg_device_config, BYTE_COUNT_ONE);
 
 	if (res) {
-		LOG_ERR("write REG_SIGNAL_PATH_RESET failed");
+		LOG_ERR("write REG_SIGNAL_PATH_RESET failed, err %d", res);
 		return res;
 	}
 
