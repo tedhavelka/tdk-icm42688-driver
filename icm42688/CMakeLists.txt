@@ -6,6 +6,7 @@ zephyr_library_sources(
     icm42688.c
     icm42688_common.c
     icm42688_spi.c
+    icm42688-bus.c
 )
 
 zephyr_library_sources_ifdef(CONFIG_SENSOR_ASYNC_API icm42688_rtio.c)
