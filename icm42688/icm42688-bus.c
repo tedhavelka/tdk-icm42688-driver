@@ -65,7 +65,6 @@ int icm42688_bus_write(const struct device *dev,
 	struct rtio_sqe *write_reg_sqe = rtio_sqe_acquire(ctx);
 	struct rtio_sqe *write_buf_sqe = rtio_sqe_acquire(ctx);
 	struct rtio_cqe *cqe;
-
 	int rc;
 	LOG_INF("W1");
 
@@ -79,7 +78,7 @@ int icm42688_bus_write(const struct device *dev,
 	rtio_sqe_prep_write(write_buf_sqe, iodev, RTIO_PRIO_HIGH, buf, len, NULL);
 	if (data->type == ICM42688_BUS_I2C) {
 		write_buf_sqe->iodev_flags |= RTIO_IODEV_I2C_STOP;
-		LOG_INF("W3");
+		LOG_INF("W3 bus i2c");
 	}
 	LOG_INF("W4");
 
@@ -92,11 +91,12 @@ int icm42688_bus_write(const struct device *dev,
 	do {
 		cqe = rtio_cqe_consume(ctx);
 		if (cqe != NULL) {
+			LOG_INF("W6 cqe ! NULL");
 			rc = cqe->result;
 			rtio_cqe_release(ctx, cqe);
 		}
 	} while (cqe != NULL);
-	LOG_INF("W6");
+	LOG_INF("W7 rc = %d", rc);
 
 	return rc;
 }
