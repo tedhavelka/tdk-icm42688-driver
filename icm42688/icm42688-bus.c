@@ -66,37 +66,37 @@ int icm42688_bus_write(const struct device *dev,
 	struct rtio_sqe *write_buf_sqe = rtio_sqe_acquire(ctx);
 	struct rtio_cqe *cqe;
 	int rc;
-	LOG_INF("W1");
+	LOG_INF("BW1");
 
 	if (!write_reg_sqe || !write_buf_sqe) {
 		return -ENOMEM;
 	}
-	LOG_INF("W2");
+	LOG_INF("BW2");
 
 	rtio_sqe_prep_write(write_reg_sqe, iodev, RTIO_PRIO_HIGH, &reg, 1, NULL);
 	write_reg_sqe->flags |= RTIO_SQE_TRANSACTION;
 	rtio_sqe_prep_write(write_buf_sqe, iodev, RTIO_PRIO_HIGH, buf, len, NULL);
 	if (data->type == ICM42688_BUS_I2C) {
 		write_buf_sqe->iodev_flags |= RTIO_IODEV_I2C_STOP;
-		LOG_INF("W3 bus i2c");
+		LOG_INF("BW3 bus i2c");
 	}
-	LOG_INF("W4");
+	LOG_INF("BW4");
 
 	rc = rtio_submit(ctx, 2);
 	if (rc) {
 		return rc;
 	}
-	LOG_INF("W5");
+	LOG_INF("BW5");
 
 	do {
 		cqe = rtio_cqe_consume(ctx);
 		if (cqe != NULL) {
-			LOG_INF("W6 cqe ! NULL");
+			LOG_INF("BW6 cqe ! NULL");
 			rc = cqe->result;
 			rtio_cqe_release(ctx, cqe);
 		}
 	} while (cqe != NULL);
-	LOG_INF("W7 rc = %d", rc);
+	LOG_INF("BW7 rc = %d", rc);
 
 	return rc;
 }

@@ -36,6 +36,7 @@ int icm42688_reset(const struct device *dev)
 	res = icm42688_bus_write(dev, REG_DEVICE_CONFIG, &reg_device_config, 1);
 
 	// - DEV 0626 INICIO -
+#if 0
 #include <zephyr/kernel.h>
 	if (res) {
 		uint32_t i = 3;
@@ -45,6 +46,7 @@ int icm42688_reset(const struct device *dev)
 			k_msleep(1);
 		} while ((res < 0) && (i > 0));
 	}
+#endif
 	// - DEV 0626 FIN -
 
 	if (res) {
