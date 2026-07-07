@@ -28,12 +28,15 @@ int icm42688_reset(const struct device *dev)
 
 	/* start up time for register read/write after POR is 1ms and supply ramp time is 3ms */
 	k_msleep(50);
-	LOG_INF("M1");
-
 	/* perform a soft reset to ensure a clean slate, reset bit will auto-clear */
 	// res = icm42688_spi_single_write(&dev_cfg->spi, REG_DEVICE_CONFIG, BIT_SOFT_RESET_CONFIG);
 	uint8_t reg_device_config = BIT_SOFT_RESET_CONFIG;
-	res = icm42688_bus_write(dev, REG_DEVICE_CONFIG, &reg_device_config, 1);
+	res = icm42688_bus_write(dev, REG_DEVICE_CONFIG, reg_device_config, 1);
+
+	LOG_INF("M3 reset");
+	LOG_INF("M4 REG_DEVICE_CONFIG: 0x%X", REG_DEVICE_CONFIG);
+	LOG_INF("M4 config val:        0x%X", reg_device_config);
+	LOG_INF("M4 conf val as ref'd: 0x%X", POINTER_TO_UINT(reg_device_config));
 
 	// - DEV 0626 INICIO -
 #if 0

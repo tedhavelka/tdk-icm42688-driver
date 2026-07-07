@@ -303,6 +303,9 @@ int icm42688_init(const struct device *dev)
 		LOG_ERR("I2C bus is not ready");
 		return -ENODEV;
 	}
+	else {
+		LOG_INF("M1 - i2c bus ready");
+	}
 #endif
 #if CONFIG_SPI_RTIO
 	if ((data->type == ICM42688_BUS_SPI) && !spi_is_ready_iodev(data->iodev)) {
@@ -311,6 +314,7 @@ int icm42688_init(const struct device *dev)
 	}
 #endif
 
+	LOG_INF("M2");
 	if (icm42688_reset(dev)) {
 		LOG_ERR("could not initialize sensor");
 		return -EIO;
@@ -351,9 +355,9 @@ void icm42688_unlock(const struct device *dev)
 #if 0
 // TODO [ ] Refactor RTIO_DEFINE() following the way ICM45686 does.
 // TOOD [ ] Refactor SPI_DT_IODEV_DEFINE()
-#define ICM42688_RTIO_DEFINE(inst)                                                                 \
-	SPI_DT_IODEV_DEFINE(icm42688_spi_iodev_##inst, DT_DRV_INST(inst), ICM42688_SPI_CFG, 0U);   \
-	RTIO_DEFINE(icm42688_rtio_##inst, 8, 4);
+// #define ICM42688_RTIO_DEFINE(inst)                                                                 \
+// 	SPI_DT_IODEV_DEFINE(icm42688_spi_iodev_##inst, DT_DRV_INST(inst), ICM42688_SPI_CFG, 0U);   \
+// 	RTIO_DEFINE(icm42688_rtio_##inst, 8, 4);
 #endif // 0
 
 #define ICM42688_DT_CONFIG_INIT(inst)						\
